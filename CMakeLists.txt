@@ -4,12 +4,13 @@ project(LaPautaAVCompresor VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# --- Descargar JUCE automáticamente en la nube ---
+# --- Descargar JUCE automáticamente en la nube (versión fija para que no se rompa) ---
 include(FetchContent)
 FetchContent_Declare(
     JUCE
     GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-    GIT_TAG        master
+    GIT_TAG        8.0.6
+    GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(JUCE)
 
@@ -18,10 +19,13 @@ juce_add_plugin(La-Pauta-AV-Compresor
     BUNDLE_ID "com.lapauta.avcompresor"
     IS_SYNTH FALSE
     IS_MIDI_EFFECT FALSE
-    EDITOR_WANTS_KEYBOARD_FOCUS TRUE
+    NEEDS_MIDI_INPUT FALSE
+    NEEDS_MIDI_OUTPUT FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     PLUGIN_MANUFACTURER_CODE "Lapt"
     PLUGIN_CODE "Avc1"
     FORMATS Standalone VST3
+    VST3_CATEGORIES Fx Dynamics
     PRODUCT_NAME "La Pauta AV Compresor"
 )
 
@@ -29,6 +33,7 @@ target_sources(La-Pauta-AV-Compresor
     PRIVATE
         Source/PluginProcessor.cpp
         Source/PluginEditor.cpp
+        Source/LaPautaLookAndFeel.cpp
 )
 
 target_compile_definitions(La-Pauta-AV-Compresor
@@ -49,5 +54,6 @@ target_link_libraries(La-Pauta-AV-Compresor
         juce::juce_data_structures
     PUBLIC
         juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
 )
