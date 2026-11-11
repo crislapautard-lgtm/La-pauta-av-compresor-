@@ -1,0 +1,32 @@
+name: Build and Generate EXE Installer
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-installer:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Configure CMake
+      run: cmake -B build -G "Visual Studio 17 2022" -A x64
+
+    - name: Build Project (Release)
+      run: cmake --build build --config Release
+
+    - name: Install Inno Setup
+      run: choco install innosetup -y
+
+    - name: Compile Installer with Inno Setup
+      run: iscc installer.iss
+
+    - name: Upload EXE Installer Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: La-Pauta-AV-Compresor-Windows-EXE
+        path: output/*.exe
