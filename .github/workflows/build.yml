@@ -3,6 +3,7 @@ name: Build and Generate EXE Installer
 on:
   push:
     branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build-and-installer:
@@ -12,20 +13,28 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Configure CMake
-      run: cmake -B build
+      run: cmake -B build -A x64
 
     - name: Build Project (Release)
-      run: cmake --build build --config Release
+      run: cmake --build build --config Release --parallel
 
     - name: Install Inno Setup
-      run: choco install innosetup -y
+      run: choco install innosetup -y --no-progress
 
     - name: Compile Installer with Inno Setup
-      run: iscc installer.iss
+      run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss'
 
     - name: Upload EXE Installer Artifact
       uses: actions/upload-artifact@v4
       with:
         name: La-Pauta-AV-Compresor-Windows-EXE
         path: output/*.exe
+        if-no-files-found: error
+
+    - name: Upload VST3 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: La-Pauta-AV-Compresor-VST3
+        path: build/La-Pauta-AV-Compresor_artefacts/Release/VST3/La Pauta AV Compresor.vst3
+        if-no-files-found: error
         
